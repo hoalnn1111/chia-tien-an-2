@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Chi Phí Ăn Uống">
+    <meta name="theme-color" content="#3b82f6">
+    
+
+    
+    <title>Ứng Dụng Tính Chi Phí Ăn Uống Nhóm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f2f2f7;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+            padding-top: max(16px, env(safe-area-inset-top));
+        }
+
+        .header {
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            color: white;
+            padding: 24px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid #f2f2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .session-form {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e5ea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #f9f9f9;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #007AFF;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .expense-row {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .expense-row:focus-within {
+            border-color: #007AFF;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .expense-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .expense-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .expense-number {
+            font-weight: 600;
+            color: #8e8e93;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            min-height: 44px;
+            padding: 0 20px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056D6;
+        }
+
+        .btn-secondary {
+            background: #8e8e93;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #6d6d70;
+        }
+
+        .btn-success {
+            background: #34C759;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #28A745;
+        }
+
+        .btn-danger {
+            background: #FF3B30;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #D70015;
+        }
+
+        .btn-small {
+            font-size: 14px;
+            min-height: 36px;
+            padding: 0 16px;
+        }
+
+        .btn-icon {
+            min-width: 44px;
+            padding: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .session-item {
+            border-bottom: 1px solid #f2f2f7;
+            padding: 20px;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .session-expenses {
+            margin-bottom: 16px;
+        }
+
+        .session-expense {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .session-expense:last-child {
+            margin-bottom: 0;
+        }
+
+        .expense-info {
+            flex: 1;
+        }
+
+        .expense-description {
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        .expense-payer {
+            font-size: 13px;
+            color: #8e8e93;
+            margin-top: 2px;
+        }
+
+        .expense-amount {
+            font-weight: 600;
+            color: #007AFF;
+            font-size: 16px;
+        }
+
+        .session-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: linear-gradient(135deg, #007AFF15, #5856D615);
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .total-label {
+            color: #007AFF;
+            font-size: 16px;
+        }
+
+        .total-amount {
+            color: #007AFF;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .summary-card.total {
+            background: linear-gradient(135deg, #007AFF15, #007AFF25);
+        }
+
+        .summary-card.per-person {
+            background: linear-gradient(135deg, #5856D615, #5856D625);
+        }
+
+        .summary-card .label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #8e8e93;
+        }
+
+        .summary-card .amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        .person-card {
+            background: #f9f9f9;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .person-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .person-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .balance-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .balance-badge.positive {
+            background: #34C759;
+            color: white;
+        }
+
+        .balance-badge.negative {
+            background: #FF3B30;
+            color: white;
+        }
+
+        .balance-badge.neutral {
+            background: #8e8e93;
+            color: white;
+        }
+
+        .person-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            font-size: 15px;
+            color: #8e8e93;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #1d1d1f;
+            font-size: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e93;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+
+        .empty-description {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* iOS-specific styles */
+        @supports (-webkit-touch-callout: none) {
+            .form-input {
+                -webkit-appearance: none;
+                border-radius: 12px;
+            }
+            
+            select.form-input {
+                background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 16px;
+                padding-right: 40px;
+            }
+        }
+
+        /* Safe area adjustments */
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #000000;
+                color: #ffffff;
+            }
+            
+            .card {
+                background: #1c1c1e;
+            }
+            
+            .card-header {
+                border-bottom-color: #38383a;
+            }
+            
+            .card-header h2,
+            .person-name,
+            .session-title,
+            .expense-description {
+                color: #ffffff;
+            }
+            
+            .form-input {
+                background: #1c1c1e;
+                border-color: #38383a;
+                color: #ffffff;
+            }
+            
+            .form-input:focus {
+                background: #2c2c2e;
+            }
+            
+            .expense-row {
+                background: #1c1c1e;
+            }
+            
+            .expense-row:focus-within {
+                background: #2c2c2e;
+            }
+            
+            .session-expense,
+            .person-card {
+                background: #2c2c2e;
+            }
+            
+            .summary-card .amount,
+            .stat-value {
+                color: #ffffff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>👥 Chi Phí Ăn Uống</h1>
+            <p>Xùi, Bí, Míp - Tính toán đơn giản và chính xác</p>
+        </div>
+
+        <!-- Form thêm phiên ăn uống -->
+        <div class="card">
+            <div class="card-header">
+                <h2>➕ Thêm Phiên Mới</h2>
+            </div>
+            <div class="card-content">
+                <div class="session-form">
+                    <div class="form-group">
+                        <label for="sessionName">Tên phiên ăn uống</label>
+                        <input type="text" id="sessionName" class="form-input" placeholder="Ví dụ: Ăn trưa quán phở - 21/7/2025">
+                    </div>
+                    
+                    <div id="expensesList">
+                        <div class="expense-row">
+                            <div class="expense-row-header">
+                                <span class="expense-number">Chi phí 1</span>
+                                <button class="btn btn-danger btn-icon btn-small" onclick="removeExpense(this)" style="visibility: hidden;">
+                                    🗑️
+                                </button>
+                            </div>
+                            <div class="expense-grid">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Mô tả (VD: Tiền ăn)" class="form-input expense-description">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" placeholder="Số tiền (VD: 120000)" class="form-input expense-amount">
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-input expense-payer">
+                                        <option value="Xùi">Xùi</option>
+                                        <option value="Bí">Bí</option>
+                                        <option value="Míp">Míp</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="addExpenseRow()">
+                            ➕ Thêm Chi Phí
+                        </button>
+                        <button class="btn btn-success" onclick="saveSession()">
+                            💾 Lưu Phiên
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách phiên ăn uống -->
+        <div id="sessionsSection" class="card hidden">
+            <div class="card-header">
+                <h2>📋 Lịch Sử Ăn Uống</h2>
+                <button class="btn btn-danger btn-small" onclick="clearAllSessions()">
+                    🗑️ Xóa tất cả
+                </button>
+            </div>
+            <div id="sessionsList"></div>
+        </div>
+
+        <!-- Kết quả tính toán -->
+        <div id="resultsSection" class="card hidden">
+            <div class="card-header">
+                <h2>🧮 Kết Quả Tính Toán</h2>
+            </div>
+            <div class="card-content">
+                <div class="summary-grid">
+                    <div class="summary-card total">
+                        <div class="label">Tổng Chi Phí</div>
+                        <div class="amount" id="totalAmount">0 VNĐ</div>
+                    </div>
+                    
+                    <div class="summary-card per-person">
+                        <div class="label">Mỗi Người Trả</div>
+                        <div class="amount" id="perPersonAmount">0 VNĐ</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1d1d1f;">Chi Tiết Từng Người:</h3>
+                    <div id="personBalances"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="empty-state">
+            <div class="empty-icon">🧮</div>
+            <div class="empty-title">Chưa có dữ liệu</div>
+            <div class="empty-description">Hãy thêm phiên ăn uống đầu tiên để bắt đầu tính toán!</div>
+        </div>
+    </div>
+
+    <script>
+        let sessions = JSON.parse(localStorage.getItem('expenseSessions') || '[]');
+        const people = ['Xùi', 'Bí', 'Míp'];
+
+        // Save to localStorage whenever sessions change
+        function saveToStorage() {
+            localStorage.setItem('expenseSessions', JSON.stringify(sessions));
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function updateExpenseNumbers() {
+            const expenseRows = document.querySelectorAll('#expensesList .expense-row');
+            expenseRows.forEach((row, index) => {
+                const numberElement = row.querySelector('.expense-number');
+                numberElement.textContent = `Chi phí ${index + 1}`;
+                
+                const deleteBtn = row.querySelector('.btn-danger');
+                if (expenseRows.length <= 1) {
+                    deleteBtn.style.visibility = 'hidden';
+                } else {
+                    deleteBtn.style.visibility = 'visible';
+                }
+            });
+        }
+
+        function addExpenseRow() {
+            const expensesList = document.getElementById('expensesList');
+            const newExpenseRow = document.createElement('div');
+            newExpenseRow.className = 'expense-row';
+            newExpenseRow.innerHTML = `
+                <div class="expense-row-header">
+                    <span class="expense-number">Chi phí 2</span>
+                    <button class="btn btn-danger btn-icon btn-small" onclick="removeExpense(this)">
+                        🗑️
+                    </button>
+                </div>
+                <div class="expense-grid">
+                    <div class="form-group">
+                        <input type="text" placeholder="Mô tả (VD: Tiền nước)" class="form-input expense-description">
+                    </div>
+                    <div class="form-group">
+                        <input type="number" placeholder="Số tiền (VD: 30000)" class="form-input expense-amount">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-input expense-payer">
+                            <option value="Xùi">Xùi</option>
+                            <option value="Bí">Bí</option>
+                            <option value="Míp">Míp</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            expensesList.appendChild(newExpenseRow);
+            updateExpenseNumbers();
+        }
+
+        function removeExpense(button) {
+            const expensesList = document.getElementById('expensesList');
+            if (expensesList.children.length > 1) {
+                button.closest('.expense-row').remove();
+                updateExpenseNumbers();
+            }
+        }
+
+        function saveSession() {
+            const sessionName = document.getElementById('sessionName').value.trim();
+            const expenseRows = document.querySelectorAll('#expensesList .expense-row');
+            
+            if (!sessionName) {
+                alert('Vui lòng nhập tên phiên ăn uống!');
+                return;
+            }
+
+            const expenses = [];
+            let hasValidExpense = false;
+
+            expenseRows.forEach(row => {
+                const description = row.querySelector('.expense-description').value.trim();
+                const amount = parseFloat(row.querySelector('.expense-amount').value);
+                const paidBy = row.querySelector('.expense-payer').value;
+
+                if (description && amount && amount > 0) {
+                    expenses.push({
+                        description: description,
+                        amount: amount,
+                        paidBy: paidBy
+                    });
+                    hasValidExpense = true;
+                }
+            });
+
+            if (!hasValidExpense) {
+                alert('Vui lòng nhập ít nhất một chi phí hợp lệ!');
+                return;
+            }
+
+            const session = {
+                id: Date.now(),
+                name: sessionName,
+                expenses: expenses,
+                total: expenses.reduce((sum, expense) => sum + expense.amount, 0),
+                date: new Date().toLocaleDateString('vi-VN')
+            };
+
+            sessions.push(session);
+            saveToStorage();
+            
+            // Clear form
+            resetForm();
+            updateDisplay();
+        }
+
+        function resetForm() {
+            document.getElementById('sessionName').value = '';
+            const expensesList = document.getElementById('expensesList');
+            expensesList.innerHTML = `
+                <div class="expense-row">
+                    <div class="expense-row-header">
+                        <span class="expense-number">Chi phí 1</span>
+                        <button class="btn btn-danger btn-icon btn-small" onclick="removeExpense(this)" style="visibility: hidden;">
+                            🗑️
+                        </button>
+                    </div>
+                    <div class="expense-grid">
+                        <div class="form-group">
+                            <input type="text" placeholder="Mô tả (VD: Tiền ăn)" class="form-input expense-description">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" placeholder="Số tiền (VD: 120000)" class="form-input expense-amount">
+                        </div>
+                        <div class="form-group">
+                            <select class="form-input expense-payer">
+                                <option value="Xùi">Xùi</option>
+                                <option value="Bí">Bí</option>
+                                <option value="Míp">Míp</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function deleteSession(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa phiên ăn uống này?')) {
+                sessions = sessions.filter(session => session.id !== id);
+                saveToStorage();
+                updateDisplay();
+            }
+        }
+
+        function clearAllSessions() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả phiên ăn uống?')) {
+                sessions = [];
+                saveToStorage();
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            const sessionsSection = document.getElementById('sessionsSection');
+            const resultsSection = document.getElementById('resultsSection');
+            const emptyState = document.getElementById('emptyState');
+            const sessionsList = document.getElementById('sessionsList');
+
+            if (sessions.length === 0) {
+                sessionsSection.classList.add('hidden');
+                resultsSection.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            sessionsSection.classList.remove('hidden');
+            resultsSection.classList.remove('hidden');
+
+            // Update sessions list
+            sessionsList.innerHTML = sessions.map(session => `
+                <div class="session-item">
+                    <div class="session-title">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">${session.name}</div>
+                            <div style="font-size: 13px; color: #8e8e93;">${session.date}</div>
+                        </div>
+                        <button class="btn btn-danger btn-small" onclick="deleteSession(${session.id})">
+                            🗑️
+                        </button>
+                    </div>
+                    
+                    <div class="session-expenses">
+                        ${session.expenses.map(expense => `
+                            <div class="session-expense">
+                                <div class="expense-info">
+                                    <div class="expense-description">${expense.description}</div>
+                                    <div class="expense-payer">Trả bởi: ${expense.paidBy}</div>
+                                </div>
+                                <div class="expense-amount">${formatCurrency(expense.amount)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="session-total">
+                        <div class="total-label">Tổng phiên này</div>
+                        <div class="total-amount">${formatCurrency(session.total)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Calculate totals across all sessions
+            const allExpenses = sessions.flatMap(session => session.expenses);
+            const totalAmount = allExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPersonAmount = totalAmount / 3;
+
+            // Calculate paid by person
+            const paidByPerson = {};
+            people.forEach(person => {
+                paidByPerson[person] = allExpenses
+                    .filter(expense => expense.paidBy === person)
+                    .reduce((sum, expense) => sum + expense.amount, 0);
+            });
+
+            // Calculate balances
+            const balances = people.map(person => ({
+                name: person,
+                paid: paidByPerson[person],
+                shouldPay: perPersonAmount,
+                balance: paidByPerson[person] - perPersonAmount
+            }));
+
+            // Update summary
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+            document.getElementById('perPersonAmount').textContent = formatCurrency(perPersonAmount);
+
+            // Update person balances
+            const personBalances = document.getElementById('personBalances');
+            personBalances.innerHTML = balances.map(person => {
+                let badgeClass, badgeText;
+                if (person.balance > 0) {
+                    badgeClass = 'positive';
+                    badgeText = `+${formatCurrency(person.balance)}`;
+                } else if (person.balance < 0) {
+                    badgeClass = 'negative';
+                    badgeText = `${formatCurrency(person.balance)}`;
+                } else {
+                    badgeClass = 'neutral';
+                    badgeText = 'Cân bằng';
+                }
+
+                return `
+                    <div class="person-card">
+                        <div class="person-header">
+                            <div class="person-name">${person.name}</div>
+                            <div class="balance-badge ${badgeClass}">${badgeText}</div>
+                        </div>
+                        <div class="person-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Đã trả</div>
+                                <div class="stat-value">${formatCurrency(person.paid)}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Cần trả</div>
+                                <div class="stat-value">${formatCurrency(person.shouldPay)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize display on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+            
+            // Simple offline support - no complex service worker needed
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                saveSession();
+            }
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
